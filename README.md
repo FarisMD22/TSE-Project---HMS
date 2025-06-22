@@ -70,7 +70,7 @@ EXIT;
 ### 2. Application Setup
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/FarisMD22/TSE-Project---HMS.git
 cd hostel-management-system
 
 # Create virtual environment
