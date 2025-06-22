@@ -1,0 +1,604 @@
+<!-- templates/admin_rooms.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Rooms - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        .admin-nav a:hover, .admin-nav a.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h2 {
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .room-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .room-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        .room-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .room-header h3 {
+            margin-bottom: 0.5rem;
+            font-size: 1.5rem;
+        }
+
+        .room-type {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            text-transform: capitalize;
+        }
+
+        .room-body {
+            padding: 1.5rem;
+        }
+
+        .room-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 0.75rem;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .info-item i {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: #667eea;
+        }
+
+        .info-item .label {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-item .value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .room-amenities {
+            margin-bottom: 1rem;
+        }
+
+        .room-amenities h4 {
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .amenities-list {
+            font-size: 0.85rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .room-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .availability-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .available {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .occupied {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h3 {
+            color: #333;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: end;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .admin-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .rooms-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <h1><i class="fas fa-building"></i> Admin Panel</h1>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{{ url_for('admin_students') }}"><i class="fas fa-users"></i> Students</a>
+            <a href="{{ url_for('admin_rooms') }}" class="active"><i class="fas fa-bed"></i> Rooms</a>
+            <a href="{{ url_for('admin_bookings') }}"><i class="fas fa-calendar"></i> Bookings</a>
+            <a href="{{ url_for('admin_payments') }}"><i class="fas fa-money-bill"></i> Payments</a>
+        </div>
+        <div class="user-info">
+            <span><i class="fas fa-user"></i> {{ session.name }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h2><i class="fas fa-bed"></i> Room Management</h2>
+            <button class="btn btn-success" onclick="openAddRoomModal()">
+                <i class="fas fa-plus"></i> Add New Room
+            </button>
+        </div>
+
+        <div class="rooms-grid">
+            {% for room in rooms %}
+            <div class="room-card">
+                <div class="room-header">
+                    <h3>{{ room.room_number }}</h3>
+                    <div class="room-type">{{ room.room_type }} Room</div>
+                </div>
+                <div class="room-body">
+                    <div class="room-info">
+                        <div class="info-item">
+                            <i class="fas fa-users"></i>
+                            <div class="label">Capacity</div>
+                            <div class="value">{{ room.capacity }} {{ 'Person' if room.capacity == 1 else 'Persons' }}</div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-rupee-sign"></i>
+                            <div class="label">Monthly Rent</div>
+                            <div class="value">RM{{ "%.0f"|format(room.rent_per_month) }}</div>
+                        </div>
+                    </div>
+                    <div class="room-amenities">
+                        <h4><i class="fas fa-star"></i> Amenities</h4>
+                        <div class="amenities-list">{{ room.amenities }}</div>
+                    </div>
+                </div>
+                <div class="room-footer">
+                    <span class="availability-badge {{ 'available' if room.is_available else 'occupied' }}">
+                        {{ 'Available' if room.is_available else 'Occupied' }}
+                    </span>
+                    <div class="room-actions">
+                        <button class="btn btn-primary btn-sm" onclick="editRoom({{ room.id }})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteRoom({{ room.id }})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Add/Edit room modal -->
+    <div id="roomModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle"><i class="fas fa-plus"></i> Add New Room</h3>
+                <span class="close" onclick="closeRoomModal()">&times;</span>
+            </div>
+            <form id="roomForm">
+                <input type="hidden" id="roomId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Room Number</label>
+                        <input type="text" id="roomNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Room Type</label>
+                        <select id="roomType" required>
+                            <option value="">Select Type</option>
+                            <option value="single">Single</option>
+                            <option value="double">Double</option>
+                            <option value="triple">Triple</option>
+                            <option value="quad">Quad</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Capacity</label>
+                        <input type="number" id="capacity" min="1" max="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Monthly Rent (RM)</label>
+                        <input type="number" id="rentPerMonth" min="0" step="0.01" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Amenities</label>
+                    <textarea id="amenities" placeholder="List all amenities available in this room..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="isAvailable" checked> Available for booking
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeRoomModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save Room</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openAddRoomModal() {
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus"></i> Add New Room';
+            document.getElementById('roomForm').reset();
+            document.getElementById('roomId').value = '';
+            document.getElementById('isAvailable').checked = true;
+            document.getElementById('roomModal').style.display = 'block';
+        }
+
+        function editRoom(id) {
+            // here is where you would fetch room data and populate the form
+            document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Room';
+            document.getElementById('roomId').value = id;
+            // populate the form with the already existing data
+            document.getElementById('roomModal').style.display = 'block';
+        }
+
+        function deleteRoom(id) {
+            if (confirm('Are you sure you want to delete this room?')) {
+                fetch(`/api/rooms/${id}/delete`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Room deleted successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while deleting the room.');
+                });
+            }
+        }
+
+        function closeRoomModal() {
+            document.getElementById('roomModal').style.display = 'none';
+        }
+
+        document.getElementById('roomForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const roomId = document.getElementById('roomId').value;
+            const isEdit = roomId !== '';
+
+            const roomData = {
+                room_number: document.getElementById('roomNumber').value,
+                room_type: document.getElementById('roomType').value,
+                capacity: parseInt(document.getElementById('capacity').value),
+                rent_per_month: parseFloat(document.getElementById('rentPerMonth').value),
+                amenities: document.getElementById('amenities').value,
+                is_available: document.getElementById('isAvailable').checked
+            };
+
+            const url = isEdit ? `/api/rooms/${roomId}/update` : '/api/rooms/add';
+            const method = isEdit ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(roomData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(isEdit ? 'Room updated successfully!' : 'Room added successfully!');
+                    closeRoomModal();
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while saving the room.');
+            });
+        });
+
+        // automatically set the capacity based on the room type
+        document.getElementById('roomType').addEventListener('change', function() {
+            const capacityMap = {
+                'single': 1,
+                'double': 2,
+                'triple': 3,
+                'quad': 4
+            };
+
+            const selectedType = this.value;
+            if (capacityMap[selectedType]) {
+                document.getElementById('capacity').value = capacityMap[selectedType];
+            }
+        });
+
+        // close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('roomModal');
+            if (event.target == modal) {
+                closeRoomModal();
+            }
+        }
+    </script>
+</body>
+</html>

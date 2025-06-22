@@ -1,0 +1,337 @@
+<!-- templates/admin_dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Hostel Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        .admin-nav a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .dashboard-container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .stat-students { color: #4CAF50; }
+        .stat-rooms { color: #2196F3; }
+        .stat-bookings { color: #FF9800; }
+        .stat-revenue { color: #9C27B0; }
+        .stat-available { color: #00BCD4; }
+        .stat-pending { color: #F44336; }
+
+        .charts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .quick-actions {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .quick-actions h3 {
+            margin-bottom: 1rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .admin-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <h1><i class="fas fa-building"></i> Admin Dashboard</h1>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{{ url_for('admin_students') }}"><i class="fas fa-users"></i> Students</a>
+            <a href="{{ url_for('admin_rooms') }}"><i class="fas fa-bed"></i> Rooms</a>
+            <a href="{{ url_for('admin_bookings') }}"><i class="fas fa-calendar"></i> Bookings</a>
+            <a href="{{ url_for('admin_payments') }}"><i class="fas fa-money-bill"></i> Payments</a>
+        </div>
+        <div class="user-info">
+            <span><i class="fas fa-user"></i> {{ session.name }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-users stat-students"></i>
+                <h3>{{ stats.total_students }}</h3>
+                <p>Total Students</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-bed stat-rooms"></i>
+                <h3>{{ stats.total_rooms }}</h3>
+                <p>Total Rooms</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-check-circle stat-available"></i>
+                <h3>{{ stats.available_rooms }}</h3>
+                <p>Available Rooms</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-calendar-check stat-bookings"></i>
+                <h3>{{ stats.active_bookings }}</h3>
+                <p>Active Bookings</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-rupee-sign stat-revenue"></i>
+                <h3>RM{{ "%.2f"|format(stats.total_revenue) }}</h3>
+                <p>Total Revenue</p>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-clock stat-pending"></i>
+                <h3>{{ stats.pending_requests }}</h3>
+                <p>Pending Requests</p>
+            </div>
+        </div>
+
+        <div class="charts-section">
+            <div class="chart-card">
+                <h3>Monthly Revenue</h3>
+                <canvas id="revenueChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Room Occupancy</h3>
+                <canvas id="occupancyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h3>Quick Actions</h3>
+            <div class="action-buttons">
+                <a href="{{ url_for('admin_students') }}" class="action-btn">
+                    <i class="fas fa-user-plus"></i> Manage Students
+                </a>
+                <a href="{{ url_for('admin_rooms') }}" class="action-btn">
+                    <i class="fas fa-plus"></i> Add Room
+                </a>
+                <a href="{{ url_for('admin_bookings') }}" class="action-btn">
+                    <i class="fas fa-calendar-alt"></i> View Bookings
+                </a>
+                <a href="{{ url_for('admin_payments') }}" class="action-btn">
+                    <i class="fas fa-money-check"></i> Track Payments
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // initialize charts
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+        });
+
+        function initializeCharts() {
+            // revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Revenue (₹)',
+                        data: [50000, 75000, 60000, 80000, 95000, 85000],
+                        borderColor: 'rgb(102, 126, 234)',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // occupancy Chart
+            const occupancyCtx = document.getElementById('occupancyChart').getContext('2d');
+            new Chart(occupancyCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Single', 'Double', 'Triple', 'Quad'],
+                    datasets: [{
+                        data: [8, 6, 4, 2],
+                        backgroundColor: [
+                            '#4CAF50',
+                            '#2196F3',
+                            '#FF9800',
+                            '#9C27B0'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

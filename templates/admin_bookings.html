@@ -1,0 +1,503 @@
+<!-- templates/admin_bookings.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Bookings - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .admin-header h1 {
+            font-size: 1.5rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .admin-nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+        .admin-nav a:hover, .admin-nav a.active {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-header h2 {
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .filter-tab {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .filter-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: #f8f9fa;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .table-header {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-approved {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-active {
+            background: #cce7f0;
+            color: #055160;
+        }
+
+        .status-rejected {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-completed {
+            background: #e2e6ea;
+            color: #383d41;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .student-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .student-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .room-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .room-badge {
+            background: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .admin-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .admin-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .filter-tabs {
+                flex-wrap: wrap;
+            }
+
+            .data-table {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="admin-header">
+        <h1><i class="fas fa-building"></i> Admin Panel</h1>
+        <div class="admin-nav">
+            <a href="{{ url_for('admin_dashboard') }}"><i class="fas fa-home"></i> Dashboard</a>
+            <a href="{{ url_for('admin_students') }}"><i class="fas fa-users"></i> Students</a>
+            <a href="{{ url_for('admin_rooms') }}"><i class="fas fa-bed"></i> Rooms</a>
+            <a href="{{ url_for('admin_bookings') }}" class="active"><i class="fas fa-calendar"></i> Bookings</a>
+            <a href="{{ url_for('admin_payments') }}"><i class="fas fa-money-bill"></i> Payments</a>
+        </div>
+        <div class="user-info">
+            <span><i class="fas fa-user"></i> {{ session.name }}</span>
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="page-header">
+            <h2><i class="fas fa-calendar"></i> Booking Management</h2>
+        </div>
+
+        <div class="filter-tabs">
+            <button class="filter-tab active" onclick="filterBookings('all')">
+                <i class="fas fa-list"></i> All Bookings
+            </button>
+            <button class="filter-tab" onclick="filterBookings('pending')">
+                <i class="fas fa-clock"></i> Pending
+            </button>
+            <button class="filter-tab" onclick="filterBookings('approved')">
+                <i class="fas fa-check"></i> Approved
+            </button>
+            <button class="filter-tab" onclick="filterBookings('active')">
+                <i class="fas fa-play"></i> Active
+            </button>
+            <button class="filter-tab" onclick="filterBookings('rejected')">
+                <i class="fas fa-times"></i> Rejected
+            </button>
+        </div>
+
+        <div class="data-table">
+            <div class="table-header">
+                <div class="table-title">
+                    <i class="fas fa-list"></i> All Bookings ({{ bookings|length }})
+                </div>
+            </div>
+
+            <table id="bookingsTable">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Student</th>
+                        <th>Room</th>
+                        <th>Start Date</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr data-status="{{ booking.status }}">
+                        <td><strong>#{{ booking.id }}</strong></td>
+                        <td>
+                            <div class="student-info">
+                                <div class="student-avatar">
+                                    {{ booking.student_name[0].upper() }}
+                                </div>
+                                <div>
+                                    <div><strong>{{ booking.student_name }}</strong></div>
+                                    <div style="font-size: 0.8rem; color: #666;">{{ booking.email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="room-info">
+                                <i class="fas fa-bed" style="color: #667eea;"></i>
+                                <div>
+                                    <div><strong>{{ booking.room_number }}</strong></div>
+                                    <span class="room-badge">{{ booking.room_type|title }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ booking.start_date if booking.start_date else 'N/A' }}</td>
+                        <td>
+                            {% if booking.total_amount %}
+                                <strong>RM{{ "%.2f"|format(booking.total_amount) }}</strong>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="status-badge status-{{ booking.status }}">
+                                {{ booking.status|title }}
+                            </span>
+                        </td>
+                        <td>{{ booking.created_at.strftime('%Y-%m-%d') if booking.created_at else 'N/A' }}</td>
+                        <td>
+                            <div class="action-buttons">
+                                {% if booking.status == 'pending' %}
+                                    <button class="btn btn-success btn-sm" onclick="approveBooking({{ booking.id }})">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button class="btn btn-danger btn-sm" onclick="rejectBooking({{ booking.id }})">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-primary btn-sm" onclick="viewBooking({{ booking.id }})">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function filterBookings(status) {
+            const tabs = document.querySelectorAll('.filter-tab');
+            const rows = document.querySelectorAll('#bookingsTable tbody tr');
+
+            // update active tab
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // filter rows
+            rows.forEach(row => {
+                const rowStatus = row.getAttribute('data-status');
+                if (status === 'all' || rowStatus === status) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // update table title
+            const visibleRows = document.querySelectorAll('#bookingsTable tbody tr[style=""], #bookingsTable tbody tr:not([style])');
+            document.querySelector('.table-title').innerHTML =
+                `<i class="fas fa-list"></i> ${status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)} Bookings (${visibleRows.length})`;
+        }
+
+        function approveBooking(id) {
+            if (confirm('Are you sure you want to approve this booking?')) {
+                fetch(`/api/bookings/${id}/approve`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Booking approved successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while approving the booking.');
+                });
+            }
+        }
+
+        function rejectBooking(id) {
+            if (confirm('Are you sure you want to reject this booking?')) {
+                fetch(`/api/bookings/${id}/reject`, {
+                    method: 'POST'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Booking rejected successfully!');
+                        location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while rejecting the booking.');
+                });
+            }
+        }
+
+        function viewBooking(id) {
+            alert('View booking details functionality - Booking ID: ' + id);
+        }
+    </script>
+</body>
+</html>

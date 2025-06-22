@@ -1,0 +1,10 @@
+macOS: pip3 install Flask==2.3.3 Flask-SQLAlchemy==3.0.5 PyMySQL==1.1.0 cryptography==41.0.4
+Windows: pip install Flask==2.3.3 Flask-SQLAlchemy==3.0.5 PyMySQL==1.1.0 cryptography==41.0.4
+
+check that you mySql and what is the password and change the password in the code below after root:your_password
+# SQLAlchemy configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@localhost/hostel_managementV2'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+then Create the database in MySQL using the following command and in terminal or MySQL Workbench:
+CREATE DATABASE hostel_managementV2;
